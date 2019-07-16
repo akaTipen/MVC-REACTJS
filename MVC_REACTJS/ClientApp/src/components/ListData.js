@@ -5,7 +5,15 @@ import { renderDate } from '../Site'
 export class ListData extends Component {
     constructor(props) {
         super(props);
-        this.state = { forecasts: [], loading: true };
+        this.state = {
+            forecasts: [],
+            loading: true
+        };
+
+        // This binding is necessary to make "this" work in the callback  
+        this.getClientReport = this.getClientReport.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
+        this.renderForecastsTable = this.renderForecastsTable.bind(this);
 
         fetch('api/SampleData/Employees')
             .then(response => response.json())
@@ -14,7 +22,30 @@ export class ListData extends Component {
             });
     }
 
-    static renderForecastsTable(forecasts) {
+    //handle download file
+    getClientReport(id) {
+        alert('test')
+    }
+
+    handleDelete(id) {
+        if (!window.confirm("Do you want to delete employee with Id: " + id))
+            return;
+        else {
+            fetch('api/SampleData/DeleteEmployee/' + id, {
+                method: 'delete'
+            }).then(data => {
+                this.setState(
+                    {
+                        empList: this.state.forecasts.filter((rec) => {
+                            return (rec.employeeId !== id);
+                        })
+                    });
+            });
+        }  
+    }
+
+    //handle table
+    renderForecastsTable(forecasts) {
         return (
             <table className='table table-striped'>
                 <thead>
@@ -22,6 +53,7 @@ export class ListData extends Component {
                         <th>No</th>
                         <th>Name</th>
                         <th>Join Date</th>
+                        <th>Photo</th>
                         <th>Height</th>
                         <th>Weight</th>
                         <th>Department</th>
@@ -30,14 +62,18 @@ export class ListData extends Component {
                 </thead>
                 <tbody>
                     {forecasts.map((forecast, index) =>
-                        <tr key={index}>
+                        <tr key={forecast.employeeId}>
                             <td>{index + 1}</td>
                             <td>{forecast.employeeName}</td>
                             <td>{renderDate(forecast.joinDate)}</td>
+                            <td><button className="btn btn-link" onClick={() => this.getClientReport(forecast.employeeId)}>Download File</button></td>
                             <td>{forecast.height}</td>
                             <td>{forecast.weight}</td>
-                            <td>{forecast.DepartmentId}</td>
-                            <td><a href="javascript;">Edit</a> | <a href="javascript;">Delete</a></td>
+                            <td>{forecast.departmentId}</td>
+                            <td>
+                                <Link className="btn btn-link" to={{ pathname: "/add-list/", data: forecast.employeeId}}>Edit</Link>
+                                <button className="btn btn-link" onClick={() => this.handleDelete(forecast.employeeId)}>Delete</button>
+                            </td>
                         </tr>
                     )}
                 </tbody>
@@ -48,7 +84,7 @@ export class ListData extends Component {
     render() {
         let contents = this.state.loading
             ? <p><em>Loading...</em></p>
-            : ListData.renderForecastsTable(this.state.forecasts);
+            : this.renderForecastsTable(this.state.forecasts);
 
         return (
             <div>
