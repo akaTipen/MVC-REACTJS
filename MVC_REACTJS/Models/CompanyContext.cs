@@ -10,8 +10,7 @@ namespace MVC_REACTJS.Models
         {
         }
 
-        public CompanyContext(DbContextOptions<CompanyContext> options)
-            : base(options)
+        public CompanyContext(DbContextOptions<CompanyContext> options) : base(options)
         {
         }
 

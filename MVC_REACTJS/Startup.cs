@@ -48,10 +48,6 @@ namespace MVC_REACTJS
                 routes.MapRoute(
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
-
-                routes.MapRoute(
-                   name: "api",
-                   template: "api/{controller}/{action}/{id?}");
             });
 
             app.UseSpa(spa =>

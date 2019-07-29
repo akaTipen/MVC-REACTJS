@@ -24,7 +24,8 @@ export class ListData extends Component {
 
     //handle download file
     getClientReport(id) {
-        alert('test')
+        //alert('test')
+        window.open('/Dwonload/GetReport/' + id, "_blank");
     }
 
     handleDelete(id) {
@@ -69,7 +70,7 @@ export class ListData extends Component {
                             <td><button className="btn btn-link" onClick={() => this.getClientReport(forecast.employeeId)}>Download File</button></td>
                             <td>{forecast.height}</td>
                             <td>{forecast.weight}</td>
-                            <td>{forecast.departmentId}</td>
+                            <td>{forecast.departmentName}</td>
                             <td>
                                 <Link className="btn btn-link" to={{ pathname: "/add-list/", data: forecast.employeeId}}>Edit</Link>
                                 <button className="btn btn-link" onClick={() => this.handleDelete(forecast.employeeId)}>Delete</button>

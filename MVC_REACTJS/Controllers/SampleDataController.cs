@@ -10,7 +10,6 @@ using MVC_REACTJS.Models;
 namespace MVC_REACTJS.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
     public class SampleDataController : Controller
     {
         #region Examples
@@ -50,9 +49,21 @@ namespace MVC_REACTJS.Controllers
         private CompanyContext db = new CompanyContext();
 
         [HttpGet("[action]")]
-        public IEnumerable<Employees> Employees()
+        public IEnumerable<EmployeesViewModel> Employees()
         {
-            return db.Employees.ToList();
+            var list = (from emp in db.Employees
+                        join dep in db.Departments on emp.DepartmentId equals dep.DepartmentId
+                        select new EmployeesViewModel
+                        {
+                            EmployeeId = emp.EmployeeId,
+                            EmployeeName = emp.EmployeeName,
+                            JoinDate = emp.JoinDate,
+                            Weight = emp.Weight,
+                            Height = emp.Height,
+                            DepartmentName = dep.DepartmenName
+                        });
+
+            return list.ToList();
         }
 
         [HttpGet("[action]/{id}")]
@@ -61,13 +72,13 @@ namespace MVC_REACTJS.Controllers
             return db.Employees.Find(id);
         }
 
-        [HttpPatch("[action]/{id}")]
-        public JsonResult UpdateEmployee(int id, [FromBody]EmployeesViewModel employee)
+        [HttpPut("[action]")]
+        public JsonResult UpdateEmployee(EmployeesViewModel employee)
         {
             try
             {
                 byte[] file = null;
-                if (employee.Photo.Length > 0)
+                if (employee.Photo != null)
                 {
                     using (var ms = new MemoryStream())
                     {
@@ -76,14 +87,15 @@ namespace MVC_REACTJS.Controllers
                     }
                 }
              
-                Employees model = db.Employees.Find(id);
-                model.EmployeeId = employee.EmployeeId;
+                Employees model = db.Employees.Find(employee.EmployeeId);
                 model.EmployeeName = employee.EmployeeName;
                 model.JoinDate = employee.JoinDate;
                 model.Weight = employee.Weight;
                 model.Height = employee.Height;
                 model.DepartmentId = employee.DepartmentId;
-                model.Photo = file;
+                if(employee.Photo != null)
+                    model.Photo = file;
+                db.Update(model);
                 db.SaveChanges();
 
                 return Json(new { success = true, message = "berhasil" });
@@ -101,7 +113,7 @@ namespace MVC_REACTJS.Controllers
             try
             {
                 byte[] file = null;
-                if (employee.Photo.Length > 0)
+                if (employee.Photo != null)
                 {
                     using (var ms = new MemoryStream())
                     {
@@ -154,12 +166,6 @@ namespace MVC_REACTJS.Controllers
             List<SelectListItem> DepartementListItem = new SelectList(DepartementList, "DepartmentId", "DepartmenName").ToList();
 
             return Json(DepartementListItem);
-        }
-
-        public FileResult GetReport(int Id)
-        {
-            Employees model = db.Employees.Find(Id);
-            return File(model.Photo, "application/pdf");
         }
     }
 }

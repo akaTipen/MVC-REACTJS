@@ -13,7 +13,8 @@ namespace MVC_REACTJS.Models
         public decimal? Height { get; set; }
         public double? Weight { get; set; }
         public int DepartmentId { get; set; }
+        public string DepartmentName { get; set; }
 
-        public virtual Departments Department { get; set; }
+        public Departments Department { get; set; }
     }
 }

@@ -13,6 +13,6 @@ namespace MVC_REACTJS.Models
         public double? Weight { get; set; }
         public int DepartmentId { get; set; }
 
-        public virtual Departments Department { get; set; }
+        public Departments Department { get; set; }
     }
 }
